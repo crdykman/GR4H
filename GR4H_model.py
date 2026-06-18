@@ -363,13 +363,13 @@ def _gr4h(prec, pet, x1, x2, x3, x4, ps0, rs0):
 
     # Compute water partioning
     for t in range(n):
-        res = _reservoirs_evaporation(prec[t], pet[t], psto, x1)
-        evap, res_prod, rout_pat = res
-
+        evap, res_prod, rout_pat = _reservoirs_evaporation(
+         prec[t], pet[t], psto, x1
+        )
         psto = psto - evap + res_prod
-        perc = psto / (1. + (psto / 4.0 / x1) ** 4.) ** 0.25 # 4 instead of 2.25 ( or 9/4) for GR4H
-        rout_pat = rout_pat + (psto - perc)
-        psto = perc
+        perc = psto * (1 - (1. + (psto / 5.25 / x1) ** 4.) ** -0.25) # 21/4 (5.25) instead of 9/4 (2.25) for GR4H
+        rout_pat = perc + rout_pat
+        psto = psto - perc
 
         uh1, uh2 = _compute_hydrograph(rout_pat, ouh1, ouh2, uh1, uh2)
 
